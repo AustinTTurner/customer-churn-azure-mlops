@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "customer-churn-azure-mlops"
+version = "0.1.0"
+description = "End-to-end customer churn prediction system using Azure Machine Learning and MLOps practices."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "MIT" }
+
+dependencies = [
+    "pandas>=2.2",
+    "scikit-learn>=1.5"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
