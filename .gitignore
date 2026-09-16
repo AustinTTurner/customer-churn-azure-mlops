@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project datasets
+data/raw/*
+data/processed/*
+
+# Preserve directory structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+#macOS
+.DS_Store

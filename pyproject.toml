@@ -12,7 +12,8 @@ license = { text = "MIT" }
 
 dependencies = [
     "pandas>=2.2",
-    "scikit-learn>=1.5"
+    "scikit-learn>=1.5",
+    "openml>=0.15",
 ]
 
 [project.optional-dependencies]
