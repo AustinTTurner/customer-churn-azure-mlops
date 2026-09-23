@@ -11,7 +11,7 @@ from customer_churn.data.validate_data import (
 
 PROCESSED_DATA_DIR = Path("data/processed")
 PROCESSED_DATA_FILE = (
-    PROCESSED_DATA_DIR / "telco_customer_churn_clean.cvs"
+    PROCESSED_DATA_DIR / "telco_customer_churn_clean.csv"
 )
 
 def clean_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
