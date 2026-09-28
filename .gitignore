@@ -227,3 +227,7 @@ data/processed/*
 
 #macOS
 .DS_Store
+
+# Generated model artifacts
+artifacts/models/*
+!artifacts/models/.gitkeep
