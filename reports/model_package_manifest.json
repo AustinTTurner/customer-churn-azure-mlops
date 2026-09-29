@@ -1,0 +1,63 @@
+{
+    "schema_version": 1,
+    "model_name": "Balanced Logistic Regression",
+    "model_version": "1.0.0",
+    "model_filename": "model.joblib",
+    "model_sha256": "83e96e5699ec7b7dbfbca0474020cfe5ad7752cff4891eeaa770713de1976857",
+    "decision_threshold": 0.55,
+    "positive_class": 1,
+    "positive_class_label": "Yes",
+    "score_calibrated": false,
+    "feature_columns": [
+        "SeniorCitizen",
+        "tenure",
+        "MonthlyCharges",
+        "TotalCharges",
+        "gender",
+        "Partner",
+        "Dependents",
+        "PhoneService",
+        "MultipleLines",
+        "InternetService",
+        "OnlineSecurity",
+        "OnlineBackup",
+        "DeviceProtection",
+        "TechSupport",
+        "StreamingTV",
+        "StreamingMovies",
+        "Contract",
+        "PaperlessBilling",
+        "PaymentMethod"
+    ],
+    "training_data": {
+        "dataset": "IBM Telco Customer Churn",
+        "openml_dataset_id": 42178,
+        "split": "stratified 80/20",
+        "random_state": 42
+    },
+    "development_evaluation": {
+        "method": "training-only out-of-fold predictions",
+        "recall_target": 0.75,
+        "recall_target_met": true,
+        "selected_metrics": {
+            "accuracy": 0.7685481008164714,
+            "precision": 0.5456282847587195,
+            "recall": 0.7638795986622073,
+            "f1": 0.6365663322185061,
+            "f2": 0.707295924687229,
+            "tn": 3188,
+            "fp": 951,
+            "fn": 353,
+            "tp": 1142
+        },
+        "limitations": [
+            "Hyperparameters and the threshold were selected using the same training dataset.",
+            "The original test set was examined during earlier model comparison.",
+            "An independent dataset is needed for an unbiased final performance estimate."
+        ]
+    },
+    "environment": {
+        "python_version": "3.12.1",
+        "scikit_learn_version": "1.9.1"
+    }
+}
