@@ -42,17 +42,14 @@ def main() -> None:
     )
 
     training_job = command (
-        code ="src",
+        code = "src",
         command = (
-            "python -m customer_churn.training.train_cloud --data ${{inputs.training.training_data}} --model-output ${{outputs.model_output}}"
+            "python -m customer_churn.training.train_cloud --data ${{inputs.training_data}} --model-output ${{outputs.model_output}}"
         ),
         inputs = {
             "training_data": Input (
                 type = AssetTypes.URI_FILE,
-                path = (
-                    "azureml:"
-                    "telco-customer-churn-clean:1"
-                ),
+                path = "azureml:telco-customer-churn-clean:1",
                 mode = "download",
             ),
         },
@@ -63,7 +60,7 @@ def main() -> None:
             ),
         },
         environment = "azureml:customer-churn-training:1",
-        indentity = UserIdentityConfiguration(),
+        identity = UserIdentityConfiguration(),
         experiment_name = (
             "customer-churn-cloud-training"
         ),
