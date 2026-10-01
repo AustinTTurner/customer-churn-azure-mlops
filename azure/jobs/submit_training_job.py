@@ -1,6 +1,7 @@
 """Submit the customer churn training job to Azure ML"""
 
 import os
+import time
 
 from azure.ai.ml import (
     Input,
@@ -101,9 +102,44 @@ def main() -> None:
     print("Streaming Azure ML job logs...")
     print()
 
-    ml_client.jobs.stream (
-        returned_job.name
-    )
+    try:
+        ml_client.jobs.stream (
+            returned_job.name
+        )
+
+    except Exception as exc:
+        print()
+        print(
+            "Live log streaming was unavailable."
+        )
+        print(
+            "Falling back to Azure ML status polling."
+        )
+        print(
+            f"Streaming error: "
+            f"{type(exc).__name__}: {exc}"
+        )
+
+        terminal_states = {
+            "Completed",
+            "Failed",
+            "Canceled",
+        }
+
+        while True:
+            current_job = ml_client.jobs.get (
+                returned_job.name
+            )
+
+            print(
+                f"Current job status: "
+                f"{current_job.status}"
+            )
+
+            if current_job.status in terminal_states:
+                break
+
+            time.sleep(20)
 
     final_job = ml_client.jobs.get (
         returned_job.name
@@ -111,7 +147,7 @@ def main() -> None:
 
     print()
     print(
-        "Final job status: "
+        f"Final job status: "
         f"{final_job.status}"
     )
 
