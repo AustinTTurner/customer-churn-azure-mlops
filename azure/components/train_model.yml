@@ -1,0 +1,26 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+
+name: customer_churn_train_model
+version: 1
+display_name: Train Customer Churn Model
+type: command
+
+description: >
+  Train the selected balanced logistic regression churn classifier and log development metrics.
+
+inputs:
+  validated_data:
+    type: uri_folder
+
+outputs:
+  model_output:
+    type: uri_folder
+
+code: ../../src
+
+command: >-
+  python -m customer_churn.pipeline.train_model --validated-data ${{inputs.validated_data}} --model-output ${{outputs.model_output}}
+
+environment: azureml:customer-churn-training:1
+
+is_deterministic: false

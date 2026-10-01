@@ -1,0 +1,26 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+
+name: customer_churn_validate_data
+version: 1
+display_name: Validate Customer Churn Data
+type: command
+
+description: >
+  Validate the cleaned customer churn dataset before model training.
+
+inputs:
+  input_data:
+    type: uri_file
+
+outputs:
+  validated_data:
+    type: uri_folder
+
+code: ../../src
+
+command: >-
+  python -m customer_churn.pipeline.validate_data --input-data ${{inputs.input_data}} --output-dir ${{outputs.validated_data}}
+
+environment: azureml:customer-churn-training:1
+
+is_deterministic: true

@@ -1,0 +1,26 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+
+name: customer_churn_package_model
+version: 1
+display_name: Package Customer Churn Model
+type: command
+
+description: >
+  Verify and package the trained customer churn model for downstream deployment.
+
+inputs:
+  model_input:
+    type: uri_folder
+
+outputs:
+  package_output:
+    type: uri_folder
+
+code: ../../src
+
+command: >-
+  python -m customer_churn.pipeline.package_model --model-input ${{inputs.model_input}} --package-output ${{outputs.package_output}}
+
+environment: azureml:customer-churn-training:1
+
+is_deterministic: true
