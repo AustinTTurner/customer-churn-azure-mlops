@@ -31,6 +31,12 @@ def main() -> None:
         help = "Azure ML model asset version.",
     )
 
+    parser.add_argument (
+        "--output-name",
+        default = "model_output",
+        help = "Named Azure ML job output containing the model."
+    )
+
     args = parser.parse_args()
 
     subscription_id = os.environ.get (
@@ -57,7 +63,7 @@ def main() -> None:
         )
 
     model_path = (
-        f"azureml://jobs/{args.job_name}/outputs/model_output"
+        f"azureml://jobs/{args.job_name}/outputs/{args.output_name}"
     )
 
     model = Model (
@@ -73,6 +79,7 @@ def main() -> None:
             "model_type": "balanced-logistic-regression",
             "decision_threshold": "0.55",
             "source_job": args.job_name,
+            "source_output": args.output_name,
         },
     )
 

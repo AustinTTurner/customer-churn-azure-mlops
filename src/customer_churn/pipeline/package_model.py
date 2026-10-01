@@ -105,10 +105,10 @@ def main() -> None:
     )
 
     package_manifest = {
-        "model_name": training_manifest[
+        "model_name": training_manifest [
             "model_name"
         ],
-        "model_version": training_manifest[
+        "model_version": training_manifest [
             "model_version"
         ],
         "decision_threshold": (

@@ -39,13 +39,15 @@ package_component = load_component (
         "Validate data, train the churn model, and package the deployment artifact."
     ),
 )
+
+
 def customer_churn_pipeline (
     pipeline_input,
 ):
     """Define the customer churn MLOps pipeline"""
 
     validate_job = validate_component (
-        input_data=pipeline_input
+        input_data = pipeline_input
     )
 
     validate_job.identity = (
@@ -88,7 +90,7 @@ def customer_churn_pipeline (
 def main() -> None:
     """Submit and monitor the Azure ML pipeline"""
 
-    subscription_id = os.environ.get(
+    subscription_id = os.environ.get (
         "AZURE_SUBSCRIPTION_ID"
     )
 
