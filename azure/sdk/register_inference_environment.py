@@ -24,7 +24,7 @@ def main() -> None:
         )
 
     ml_client = MLClient (
-        credentail = DefaultAzureCredential(),
+        credential = DefaultAzureCredential(),
         subscription_id = subscription_id,
         resource_group_name = RESOURCE_GROUP,
         workspace_name = WORKSPACE_NAME,
@@ -32,12 +32,12 @@ def main() -> None:
 
     environment = Environment (
         name = "customer-churn-inference",
-        version = "1",
-        decription = (
+        version = "2",
+        description = (
             "Inference environment for the customer churn managed online endpoint."
         ),
         image = (
-            "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:lastest"
+            "mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest"
         ),
         conda_file = (
             "azure/environments/inference_conda.yml"
