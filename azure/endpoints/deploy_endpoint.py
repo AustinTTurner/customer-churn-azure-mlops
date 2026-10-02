@@ -84,7 +84,7 @@ def main() -> None:
         name = "blue",
         endpoint_name = args.endpoint_name,
         model = MODEL,
-        enviroment = ENVIRONMENT,
+        environment = ENVIRONMENT,
         code_configuration = CodeConfiguration (
             code = "azure/endpoints/scoring",
             scoring_script = "score.py",
@@ -95,7 +95,7 @@ def main() -> None:
     )
 
     print()
-    print("Creatin blue deployment...")
+    print("Creating blue deployment...")
 
     ml_client.online_deployments.begin_create_or_update (
         deployment
