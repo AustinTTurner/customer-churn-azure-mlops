@@ -159,7 +159,7 @@ def run(raw_data):
     ):
         results.append (
             {
-                "churn_scores": float(score),
+                "churn_score": float(score),
                 "predicted_churn": int (
                     prediction
                 ),
