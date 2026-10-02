@@ -23,7 +23,7 @@ MODEL = (
 
 ENVIRONMENT = (
     "azureml:"
-    "customer=churn-inference:1"
+    "customer-churn-inference:2"
 )
 
 
@@ -56,7 +56,7 @@ def main() -> None:
         workspace_name = WORKSPACE_NAME,
     )
 
-    endpoint = ManagedOnlineDeployment (
+    endpoint = ManagedOnlineEndpoint (
         name = args.endpoint_name,
         description = (
             "Real-time customer churn prediction endpoint."
