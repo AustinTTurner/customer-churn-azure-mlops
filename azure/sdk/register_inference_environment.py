@@ -58,7 +58,7 @@ def main() -> None:
 
     print()
     print(
-        "Azure Ml inference environment registered successfully."
+        "Azure ML inference environment registered successfully."
     )
 
     print(
