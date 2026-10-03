@@ -1,0 +1,43 @@
+{
+    "project": {
+        "name": "customer-churn-azure-mlops",
+        "environment": "development"
+    },
+    "azure": {
+        "location": "southcentralus",
+        "resource_group": "rg-customer-churn-mlops-dev",
+        "workspace_name": "mlw-customer-churn-dev"
+    },
+    "assets": {
+        "data": {
+            "name": "telco-customer-churn-clean",
+            "verison": "1"
+        },
+        "training_environment": {
+            "name": "customer-churn-training",
+            "verison": "1"
+        },
+        "inference_environment": {
+            "name": "customer-churn-inference",
+            "version": "2"
+        },
+        "model": {
+            "name": "customer-churn-balanced-logistic",
+            "version": "2"
+        }
+    },
+    "experiments": {
+    "training": "customer-churn-cloud-training",
+    "pipeline": "customer-churn-mlops-pipeline"
+    },
+    "deployment": {
+        "endpoint_prefix": "churn-mlops",
+        "name": "blue",
+        "instance_type": "Standard_DS2_v2",
+        "instance_count": 1
+    },
+    "tags": {
+        "project": "customer-churn-azure-mlops",
+        "environment": "development"
+    }
+}

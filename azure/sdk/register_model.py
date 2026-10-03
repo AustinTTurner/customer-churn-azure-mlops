@@ -8,14 +8,19 @@ from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import Model
 from azure.identity import DefaultAzureCredential
 
-RESOURCE_GROUP = "rg-customer-churn-mlops-dev"
-WORKSPACE_NAME = "mlw-customer-churn-dev"
-
-MODEL_NAME = "customer-churn-balanced-logistic"
+from customer_churn.config import load_azure_config
 
 
 def main() -> None:
     """Register a completed Azure ML job's model output"""
+
+    config = load_azure_config()
+
+    resource_group = config["azure"]["resource_group"]
+    workspace_name = config["azure"]["workspace_name"]
+
+    model_name = config["assets"]["model"]["name"]
+    project_name = config["project"]["name"]
 
     parser = argparse.ArgumentParser()
 
@@ -27,7 +32,7 @@ def main() -> None:
 
     parser.add_argument (
         "--model-version",
-        default = "1",
+        required = True,
         help = "Azure ML model asset version.",
     )
 
@@ -51,8 +56,8 @@ def main() -> None:
     ml_client = MLClient (
         credential = DefaultAzureCredential(),
         subscription_id = subscription_id,
-        resource_group_name = RESOURCE_GROUP,
-        workspace_name = WORKSPACE_NAME,
+        resource_group_name = resource_group,
+        workspace_name = workspace_name,
     )
 
     job = ml_client.jobs.get(args.job_name)
@@ -67,7 +72,7 @@ def main() -> None:
     )
 
     model = Model (
-        name = MODEL_NAME,
+        name = model_name,
         version = args.model_version,
         path = model_path,
         type = AssetTypes.CUSTOM_MODEL,
@@ -75,7 +80,7 @@ def main() -> None:
             "Balanced logistic regression customer churn model trained in Azure Machine Learning."
         ),
         tags = {
-            "project": "customer-churn-azure-mlops",
+            "project": project_name,
             "model_type": "balanced-logistic-regression",
             "decision_threshold": "0.55",
             "source_job": args.job_name,

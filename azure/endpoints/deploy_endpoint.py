@@ -9,26 +9,36 @@ from azure.ai.ml.entities import (
     ManagedOnlineDeployment,
     ManagedOnlineEndpoint,
 )
-
 from azure.identity import DefaultAzureCredential
 
-
-RESOURCE_GROUP = "rg-customer-churn-mlops-dev"
-WORKSPACE_NAME = "mlw-customer-churn-dev"
-
-MODEL = (
-    "azureml:"
-    "customer-churn-balanced-logistic:2"
-)
-
-ENVIRONMENT = (
-    "azureml:"
-    "customer-churn-inference:2"
-)
+from customer_churn.config import load_azure_config
 
 
 def main() -> None:
-    """Create the endpoint and blue deployment"""
+    """Create the endpoint and managed online deployment"""
+
+    config = load_azure_config()
+
+    resource_group = config["azure"]["resource_group"]
+    workspace_name = config["azure"]["workspace_name"]
+
+    model_config = config["assets"]["model"]
+    inference_environment_config = (
+        config["assets"]["inference_environment"]
+    )
+    deployment_config = config["depolyment"]
+
+    project_name = config["project"]["name"]
+
+    model_reference = (
+        f"azureml:{model_config['name']}:"
+        f"{model_config['version']}"
+    )
+
+    environment_reference = (
+        f"azureml:{inference_environment_config['name']}:"
+        f"{inference_environment_config['version']}"
+    )
 
     parser = argparse.ArgumentParser()
 
@@ -52,8 +62,8 @@ def main() -> None:
     ml_client = MLClient (
         credential = DefaultAzureCredential(),
         subscription_id = subscription_id,
-        resource_group_name = RESOURCE_GROUP,
-        workspace_name = WORKSPACE_NAME,
+        resource_group_name = resource_group,
+        workspace_name = workspace_name,
     )
 
     endpoint = ManagedOnlineEndpoint (
@@ -63,10 +73,8 @@ def main() -> None:
         ),
         auth_mode = "key",
         tags = {
-            "project": (
-                "customer-churn-azure-mlops"
-            ),
-            "stage": "portfolio-demo"
+            "project": project_name,
+            "stage": "online-deployment",
         },
     )
 
@@ -81,21 +89,23 @@ def main() -> None:
     ).result()
 
     deployment = ManagedOnlineDeployment (
-        name = "blue",
+        name = deployment_config["name"],
         endpoint_name = args.endpoint_name,
-        model = MODEL,
-        environment = ENVIRONMENT,
+        model = model_reference,
+        environment = environment_reference,
         code_configuration = CodeConfiguration (
             code = "azure/endpoints/scoring",
             scoring_script = "score.py",
         ),
-        instance_type = "Standard_DS2_v2",
-        instance_count = 1,
+        instance_type = deployment_config["instance_type"],
+        instance_count = deployment_config["instance_count"],
         app_insights_enabled = True,
     )
 
     print()
-    print("Creating blue deployment...")
+    print(
+        f"Creating {deployment_config['name']} deployment..."
+    )
 
     ml_client.online_deployments.begin_create_or_update (
         deployment
@@ -108,7 +118,7 @@ def main() -> None:
     )
 
     endpoint.traffic = {
-        "blue": 100
+        deployment_config["name"]: 100
     }
 
     ml_client.online_endpoints.begin_create_or_update (
@@ -128,7 +138,7 @@ def main() -> None:
 
     print(
         f"Endpoint: "
-        f"{final_endpoint}"
+        f"{final_endpoint.name}"
     )
 
     print(
@@ -137,7 +147,8 @@ def main() -> None:
     )
 
     print(
-        "Traffic: blue = 100%"
+        f"Traffic: "
+        f"{deployment_config['name']} = 100%"
     )
 
 

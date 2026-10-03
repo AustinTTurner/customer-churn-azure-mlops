@@ -9,15 +9,16 @@ from azure.ai.ml import (
     dsl,
     load_component,
 )
-
 from azure.ai.ml.entities import (
     UserIdentityConfiguration,
 )
-
 from azure.identity import DefaultAzureCredential
 
-RESOURCE_GROUP = "rg-customer-churn-mlops-dev"
-WORKSPACE_NAME = "mlw-customer-churn-dev"
+from customer_churn.config import load_azure_config
+
+
+CONFIG = load_azure_config()
+PIPELINE_NAME = CONFIG["experiments"]["pipeline"]
 
 
 validate_component = load_component (
@@ -34,7 +35,7 @@ package_component = load_component (
 
 
 @dsl.pipeline (
-    name = "customer-churn-mlops-pipeline",
+    name = PIPELINE_NAME,
     description = (
         "Validate data, train the churn model, and package the deployment artifact."
     ),
@@ -90,6 +91,18 @@ def customer_churn_pipeline (
 def main() -> None:
     """Submit and monitor the Azure ML pipeline"""
 
+    resource_group = CONFIG["azure"]["resource_group"]
+    workspace_name = CONFIG["azure"]["workspace_name"]
+
+    data_config = CONFIG["assets"]["data"]
+
+    project_name = CONFIG["project"]["name"]
+
+    data_reference = (
+        f"azureml:{data_config['name']};"
+        f"{data_config['version']}"
+    )
+
     subscription_id = os.environ.get (
         "AZURE_SUBSCRIPTION_ID"
     )
@@ -102,16 +115,14 @@ def main() -> None:
     ml_client = MLClient (
         credential = DefaultAzureCredential(),
         subscription_id = subscription_id,
-        resource_group_name = RESOURCE_GROUP,
-        workspace_name = WORKSPACE_NAME,
+        resource_group_name = resource_group,
+        workspace_name = workspace_name,
     )
 
     pipeline_job = customer_churn_pipeline (
-        pipeline_input=Input (
+        pipeline_input = Input (
             type = "uri_file",
-            path = (
-                "azureml:telco-customer-churn-clean:1"
-            ),
+            path = data_reference,
             mode = "download",
         ),
     )
@@ -120,21 +131,17 @@ def main() -> None:
         "serverless"
     )
 
-    pipeline_job.display_name = (
-        "customer-churn-mlops-pipeline"
-    )
+    pipeline_job.display_name = PIPELINE_NAME
 
     pipeline_job.tags = {
-        "project": "customer-churn-azure-mlops",
+        "project": project_name,
         "stage": "pipeline",
     }
 
     returned_job = (
         ml_client.jobs.create_or_update (
             pipeline_job,
-            experiment_name = (
-                "customer-churn-mlops-pipeline"
-            ),
+            experiment_name = PIPELINE_NAME,
         )
     )
 

@@ -5,12 +5,16 @@ import os
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 
-RESOURCE_GROUP = "rg-customer-churn-mlops-dev"
-WORKSPACE_NAME = "mlw-customer-churn-dev"
+from customer_churn.config import load_azure_config
 
 
 def main() -> None:
     """Connect to Azure ML and verify workspace access"""
+
+    config = load_azure_config()
+
+    resource_group = config["azure"]["resource_group"]
+    workspace_name = config["azure"]["workspace_name"]
 
     subscription_id = os.environ.get (
         "AZURE_SUBSCRIPTION_ID"
@@ -26,12 +30,12 @@ def main() -> None:
     ml_client = MLClient (
         credential = credential,
         subscription_id = subscription_id,
-        resource_group_name = RESOURCE_GROUP,
-        workspace_name =WORKSPACE_NAME,
+        resource_group_name = resource_group,
+        workspace_name = workspace_name,
     )
 
     workspace = ml_client.workspaces.get (
-        WORKSPACE_NAME
+        workspace_name
     )
 
     print()

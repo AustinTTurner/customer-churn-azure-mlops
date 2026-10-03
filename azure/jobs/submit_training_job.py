@@ -9,20 +9,39 @@ from azure.ai.ml import (
     Output,
     command,
 )
-
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import (
     UserIdentityConfiguration,
 )
-
 from azure.identity import DefaultAzureCredential
 
-RESOURCE_GROUP = "rg-customer-churn-mlops-dev"
-WORKSPACE_NAME = "mlw-customer-churn-dev"
+from customer_churn.config import load_azure_config
 
 
 def main() -> None:
     """Submit and monitor the Azure ML training job"""
+
+    config = load_azure_config()
+
+    resource_group = config["azure"]["resource_group"]
+    workspace_name = config["azure"]["workspace_name"]
+
+    data_config = config["assets"]["data"]
+    training_environment_config = (
+        config["assets"]["training_environment"]
+    )
+
+    experiment_name = config["experiments"]["training"]
+    project_name = config["project"]["name"]
+
+    data_reference = (
+        f"azureml:{data_config['name']}:{data_config['version']}"
+    )
+
+    environment_reference = (
+        f"azureml:{training_environment_config['name']}:"
+        f"{training_environment_config['version']}"
+    )
 
     subscription_id = os.environ.get (
         "AZURE_SUBSCRIPTION_ID"
@@ -38,19 +57,21 @@ def main() -> None:
     ml_client = MLClient (
         credential = credential,
         subscription_id = subscription_id,
-        resource_group_name = RESOURCE_GROUP,
-        workspace_name = WORKSPACE_NAME,
+        resource_group_name = resource_group,
+        workspace_name = workspace_name,
     )
 
     training_job = command (
         code = "src",
         command = (
-            "python -m customer_churn.training.train_cloud --data ${{inputs.training_data}} --model-output ${{outputs.model_output}}"
+            "python -m customer_churn.training.train_cloud "
+            "--data ${{inputs.training_data}} "
+            "--model-output ${{outputs.model_output}}"
         ),
         inputs = {
             "training_data": Input (
                 type = AssetTypes.URI_FILE,
-                path = "azureml:telco-customer-churn-clean:1",
+                path = data_reference,
                 mode = "download",
             ),
         },
@@ -60,11 +81,9 @@ def main() -> None:
                 mode = "upload",
             ),
         },
-        environment = "azureml:customer-churn-training:1",
+        environment = environment_reference,
         identity = UserIdentityConfiguration(),
-        experiment_name = (
-            "customer-churn-cloud-training"
-        ),
+        experiment_name = experiment_name,
         display_name = (
             "customer-churn-balanced-logistic"
         ),
@@ -72,7 +91,7 @@ def main() -> None:
             "Train the selected customer churn classifier using Azure ML serverless compute."
         ),
         tags = {
-            "project": "customer-churn-azure-mlops",
+            "project": project_name,
             "stage": "cloud-training",
             "model": "balanced-logistic-regression",
         },

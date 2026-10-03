@@ -8,11 +8,7 @@ from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import Data
 from azure.identity import DefaultAzureCredential
 
-RESOURCE_GROUP = "rg-customer-churn-mlops-dev"
-WORKSPACE_NAME = "mlw-customer-churn-dev"
-
-DATA_ASSET_NAME = "telco-customer-churn-clean"
-DATA_ASSET_VERSION = "1"
+from customer_churn.config import load_azure_config
 
 LOCAL_DATA_PATH = Path (
     "data/processed/telco_customer_churn_clean.csv"
@@ -21,6 +17,17 @@ LOCAL_DATA_PATH = Path (
 
 def main() -> None:
     """Upload and register the cleaned dataset"""
+
+    config = load_azure_config()
+
+    resource_group = config["azure"]["resource_group"]
+    workspace_name = config["azure"]["workspace_name"]
+
+    data_config = config["assets"]["data"]
+    data_asset_name = data_config["name"]
+    data_asset_version = data_config["version"]
+
+    project_name = config["project"]["name"]
 
     subscription_id = os.environ.get (
         "AZURE_SUBSCRIPTION_ID"
@@ -41,20 +48,20 @@ def main() -> None:
     ml_client = MLClient (
         credential = credential,
         subscription_id = subscription_id,
-        resource_group_name = RESOURCE_GROUP,
-        workspace_name = WORKSPACE_NAME,
+        resource_group_name = resource_group,
+        workspace_name = workspace_name,
     )
 
     data_asset = Data (
-        name = DATA_ASSET_NAME,
-        version = DATA_ASSET_VERSION,
+        name = data_asset_name,
+        version = data_asset_version,
         description = (
             "Cleaned IBM Telco Customer Churn dataset used for Azure ML training."
         ),
         path = str(LOCAL_DATA_PATH),
         type = AssetTypes.URI_FILE,
         tags = {
-            "project": "customer-churn-azure-mlops",
+            "project": project_name,
             "stage": "cleaned",
         },
     )

@@ -6,15 +6,22 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Environment
 from azure.identity import DefaultAzureCredential
 
-RESOURCE_GROUP = "rg-customer-churn-mlops-dev"
-WORKSPACE_NAME = "mlw-customer-churn-dev"
-
-ENVIRONMENT_NAME = "customer-churn-training"
-ENVIRONMENT_VERSION = "1"
+from customer_churn.config import load_azure_config
 
 
 def main() -> None:
     """Register the cloud training environment"""
+
+    config = load_azure_config()
+
+    resource_group = config["azure"]["resource_group"]
+    workspace_name = config["azure"]["workspace_name"]
+
+    environment_config = config["assets"]["training_environment"]
+    environment_name = environment_config["name"]
+    environment_version = environment_config["version"]
+
+    project_name = config["project"]["name"]
 
     subscription_id = os.environ.get (
         "AZURE_SUBSCRIPTION_ID"
@@ -28,13 +35,13 @@ def main() -> None:
     ml_client = MLClient (
         credential = DefaultAzureCredential(),
         subscription_id = subscription_id,
-        resource_group_name = RESOURCE_GROUP,
-        workspace_name = WORKSPACE_NAME,
+        resource_group_name = resource_group,
+        workspace_name = workspace_name,
     )
 
     environment = Environment (
-        name = ENVIRONMENT_NAME,
-        version = ENVIRONMENT_VERSION,
+        name = environment_name,
+        version = environment_version,
         description = (
             "Reproducible Azure ML environment for customer churn model training."
         ),
@@ -43,7 +50,7 @@ def main() -> None:
         ),
         conda_file = "azure/environments/train_conda.yml",
         tags = {
-            "project": "customer-churn-azure-mlops",
+            "project": project_name,
             "purpose": "cloud-training",
         },
     )
