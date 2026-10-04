@@ -7,6 +7,7 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import Model
 from azure.identity import DefaultAzureCredential
+from azure.core.exceptions import ResourceNotFoundError
 
 from customer_churn.config import load_azure_config
 
@@ -88,12 +89,49 @@ def main() -> None:
         },
     )
 
-    registered = ml_client.models.create_or_update (
-        model
-    )
+    try:
+        registered = ml_client.models.get (
+            name = model_name,
+            version = args.model_version,
+        )
 
-    print()
-    print(f"Azure ML model registered successfully.")
+        print()
+        print(
+            "Azure ML model already exists. "
+            "Reusing the registered version."
+        )
+
+    except ResourceNotFoundError:
+        model_path = (
+            f"azureml://jobs/{args.job_name}/outputs/"
+            f"{args.output_name}"
+        )
+
+        model = Model (
+            name = model_name,
+            version = args.model_version,
+            path = model_path,
+            type = AssetTypes.CUSTOM_MODEL,
+            description = (
+                "Balanced logistic regression customer churn "
+                "model trained in Azure Machine Learning."
+            ),
+            tags = {
+                "project": project_name,
+                "model_type": "balanced-logistic-regression",
+                "decision_threshold": "0.55",
+                "source_job": args.job_name,
+                "source_output": args.output_name,
+            },
+        )
+
+        registered = ml_client.models.create_or_update (
+            model
+        )
+
+        print()
+        print("Azure ML model registered successfully.")
+
     print(f"Name: {registered.name}")
     print(f"Version: {registered.version}")
     print(f"Type: {registered.type}")
