@@ -7,6 +7,7 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import Data
 from azure.identity import DefaultAzureCredential
+from azure.core.exceptions import ResourceNotFoundError
 
 from customer_churn.config import load_azure_config
 
@@ -66,12 +67,27 @@ def main() -> None:
         },
     )
 
-    registered = ml_client.data.create_or_update (
-        data_asset
-    )
+    try:
+        registered = ml_client.data.get (
+            name = data_asset_name,
+            version = data_asset_version,
+        )
 
-    print()
-    print("Azure ML data asset registered successfully.")
+        print()
+        print(
+            "Azure ML data asset already exists. "
+            "Reusing the registered version."
+        )
+
+    except ResourceNotFoundError:
+        registered = ml_client.data.create_or_update (
+            data_asset
+        )
+        
+        print()
+        print("Azure ML data asset registered successfully.")
+
+
     print(f"Name: {registered.name}")
     print(f"Version: {registered.version}")
     print(f"Type: {registered.type}")
