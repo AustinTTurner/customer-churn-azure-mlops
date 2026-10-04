@@ -5,6 +5,7 @@ import os
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Environment
 from azure.identity import DefaultAzureCredential
+from azure.core.exceptions import ResourceNotFoundError
 
 from customer_churn.config import load_azure_config
 
@@ -57,16 +58,31 @@ def main() -> None:
         },
     )
 
-    registered_environment = (
-        ml_client.environments.create_or_update (
-            environment
+    try:
+        registered_environment = (
+            ml_client.environments.get (
+                name = environment_name,
+                version = environment_version,
+            )
         )
-    )
 
-    print()
-    print(
-        "Azure ML inference environment registered successfully."
-    )
+        print()
+        print(
+            "Azure ML inference environment already exists. "
+            "Reusing the registered version."
+        )
+
+    except ResourceNotFoundError:
+        registered_environment = (
+            ml_client.environments.create_or_update (
+                environment
+            )
+        )
+
+        print()
+        print(
+            "Azure ML inference environment registered successfully."
+        )
 
     print(
         f"Name: "
