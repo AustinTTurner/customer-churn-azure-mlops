@@ -8,6 +8,7 @@
 # Terraform plan files
 *.tfplan
 tfplan
+tfdestroyplan
 
 # Variable files may contain environment-specific or sensitive values
 *.tfvars
