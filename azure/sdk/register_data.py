@@ -83,9 +83,11 @@ def main() -> None:
         registered = ml_client.data.create_or_update (
             data_asset
         )
-        
+
         print()
-        print("Azure ML data asset registered successfully.")
+        print(
+            "Azure ML data asset registered successfully."
+        )
 
 
     print(f"Name: {registered.name}")
