@@ -692,6 +692,52 @@ The dependency lock file should remain tracked:
 
 ---
 
+## Continuous Integration
+
+Terraform configuration is automatically validated with GitHub Actions.
+
+The CI workflow is defined in:
+```text
+../../.github/workflows/ci.yml
+```
+
+The Terraform validation job runs on pull requests targeting `main`, pushes to `main`, and manual workflow dispatch.
+
+The workflow performs:
+```text
+terraform fmt -check -recursive
+        │
+        ▼
+terraform init -backend=false -input=false
+        │
+        ▼
+terraform validate -no-color
+```
+
+The workflow intentionally uses:
+```
+-backend=false
+```
+
+during initialization because CI only validates the Terraform configuration. It does not access or modify Terraform state.
+
+The CI job also does not:
+
+- Authenticate to Azure
+- Run `terraform plan`
+- Run `terraform apply`
+- Run `terraform destroy`
+- Create Azure resources
+- Modify Azure infrastructure
+
+This allows infrastructure configuration to be validated safely during pull-request review without requiring Azure credentials or generating cloud costs.
+
+The Terraform CI job was successfully executed as part of the project's GitHub pull request workflow.
+
+Continuous Deployment of Terraform infrastructure is not currently implemented.
+
+---
+
 ## Infrastructure Lifecycle Demonstrated
 
 The complete infrastructure lifecycle demonstrated by the project was:
@@ -802,19 +848,18 @@ Potential production-oriented infrastructure improvements include:
 - Azure Storage remote Terraform backend
 - State locking
 - Separate state per environment
-- Development, staging, and production workspaces
+- Separate development, staging, and production environments
 - Private networking
 - Azure Private Link
 - Restricted public network access
 - Stronger Azure RBAC
 - Managed identities for automation
 - More restrictive Key Vault access
-- Automated Terraform validation in CI/CD
+- Environment-controlled Continuous Deployment with approval gates
 - Policy enforcement
 - Security scanning
 - Cost controls
 - Centralized monitoring and alerting
-- Approval workflows for infrastructure changes
 
 These items are documented as future improvements and are not represented as functionality already implemented by the current project.
 

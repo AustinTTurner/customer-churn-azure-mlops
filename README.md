@@ -574,6 +574,79 @@ The final test suite was executed successfully with Python 3.12.1.
 
 ---
 
+## Continuous Integration
+
+GitHub Actions provides continuous integration for the project through:
+
+```text
+.github/workflows/ci.yml
+```
+
+The workflow runs automatically on:
+
+- Pull requests targeting `main`
+- Pushes to `main`
+- Manual workflow dispatch
+
+Two independent CI jobs validate the project.
+
+**Python Tests**
+
+The Python CI job:
+
+1. Checks out the repository
+2. Configures Python 3.12
+3. Installs the project with development dependencies
+4. Runs the complete automated test suite
+
+The current test suite contains:
+```
+35 tests
+35 passed
+```
+
+**Terraform Validation**
+
+The Terraform CI job:
+
+1. Checks out the repository
+2. Configures Terraform 1.16.4
+3. Runs Terraform formatting validation
+4. Initializes Terraform without a backend
+5. Validates the Terraform configuration
+
+The workflow executes:
+
+```
+terraform fmt -check -recursive
+terraform init -backend=false -input=false
+terraform validate -no-color
+```
+
+Both CI jobs were successfully executed through the project's pull request workflow.
+```text
+Pull Request
+      │
+      ├──────────────► Python Tests
+      │                 35 tests
+      │
+      └──────────────► Terraform Validation
+                        fmt
+                        init
+                        validate
+      │
+      ▼
+CI Checks Pass
+      │
+      ▼
+Eligible for Merge
+```
+The CI workflow intentionally does not authenticate to Azure, create infrastructure, deploy models, or incur Azure resource costs.
+
+Continuous Deployment is not currently implemented.
+
+---
+
 ## Technology Stack
 
 ### Machine Learning
@@ -602,6 +675,7 @@ The final test suite was executed successfully with Python 3.12.1.
 - pytest
 - Git
 - GitHub
+- GitHub Actions
 - VS Code
 
 ---
@@ -610,6 +684,10 @@ The final test suite was executed successfully with Python 3.12.1.
 
 ```text
 customer-churn-azure-mlops/
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 │
 ├── azure/
 │   ├── components/
@@ -706,7 +784,7 @@ The project was developed and tested with Python 3.12.1.
 ### Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/AustinTTurner/customer-churn-azure-mlops.git
 cd customer-churn-azure-mlops
 ```
 
@@ -725,7 +803,7 @@ PowerShell:
 ### Install the Project
 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 ```
 
 ### Run the Test Suite
@@ -854,7 +932,7 @@ This project has several intentional limitations:
 - Terraform currently uses local state.
 - Networking is intentionally simplified for a development environment.
 - The Azure ML endpoint used a lightweight demonstration instance rather than production sizing.
-- No CI/CD workflow is currently implemented.
+- Continuous Integration is implemented with GitHub Actions, but Continuous Deployment is not currently implemented.
 - The infrastructure is designed as a single development environment rather than separate development, staging, and production environments.
 
 ---
@@ -871,9 +949,8 @@ Potential extensions include:
 - Add Terraform state locking and controlled access
 - Implement private networking and private endpoints
 - Strengthen Azure identity and access controls
-- Add GitHub Actions for automated testing and infrastructure validation
+- Extend GitHub Actions with environment-controlled Continuous Deployment and deployment approval workflows
 - Add separate development, staging, and production environments
-- Add automated deployment approval workflows
 - Expand inference observability and operational monitoring
 
 ---
