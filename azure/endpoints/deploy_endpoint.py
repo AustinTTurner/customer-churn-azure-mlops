@@ -26,7 +26,7 @@ def main() -> None:
     inference_environment_config = (
         config["assets"]["inference_environment"]
     )
-    deployment_config = config["depolyment"]
+    deployment_config = config["deployment"]
 
     project_name = config["project"]["name"]
 

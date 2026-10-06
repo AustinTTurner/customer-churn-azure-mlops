@@ -1,0 +1,7 @@
+# Optional infrastructure override.
+# Terraform uses the defaults in variables.tf when these are not supplied.
+
+storage_account_replication_type     = "LRS"
+container_registry_sku               = "Basic"
+log_analytics_retention_days         = 30
+key_vault_soft_delete_retention_days = 7

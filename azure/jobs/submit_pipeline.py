@@ -99,7 +99,7 @@ def main() -> None:
     project_name = CONFIG["project"]["name"]
 
     data_reference = (
-        f"azureml:{data_config['name']};"
+        f"azureml:{data_config['name']}:"
         f"{data_config['version']}"
     )
 
